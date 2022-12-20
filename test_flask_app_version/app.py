@@ -1,8 +1,9 @@
-from flask import Flask
+from flask import Flask, render_template
 from marvel import Marvel
 import hashlib
 import requests
 import datetime
+import inspect
 
 from pprint import pprint as pp
 
@@ -39,14 +40,24 @@ def hello_world():
 
 @app.route("/characters")
 def characters():
-    html = []
     params = {'ts': timestamp, 'apikey': PUBLIC_KEY, 'hash': hash_params()};
-    res = requests.get('https://gateway.marvel.com:443/v1/public/characters',
+    res = requests.get('https://gateway.marvel.com:443/v1/public/characters/1009399',
                     params=params)
-    results = res.json()
-    html.append(results["data"]["results"])
-    return html
+    results = res.json()["data"]["results"][0]
+    comics_data = results["comics"]
+    stories_data = results["stories"]
+    events_data = results["events"]
+    series_data = results["series"]
 
+    comics = comics_data["items"]
+    events = events_data["items"]
+    name = results["name"]
+    series = series_data["items"]
+    stories = stories_data["items"]
+    char_thumbnail = results["thumbnail"]
+    char_thumb_path = char_thumbnail["path"]
+    
+    return render_template('./index.html', name=name, comics=comics)
 @app.route("/comics")
 def comics():
     html = ""
