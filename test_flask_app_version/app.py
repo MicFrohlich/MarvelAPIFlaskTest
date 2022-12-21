@@ -1,38 +1,23 @@
 from flask import Flask, render_template
 from marvel import Marvel
-import hashlib
+from custom_functions import (
+    get_story, 
+    get_characters, 
+    hash_params, 
+    get_params, 
+    get_character_thumbnails,
+    character_names_and_thumbnails
+)
 import requests
 import datetime
 import inspect
 
 from pprint import pprint as pp
 
-
-PUBLIC_KEY = "52cc87e2d83af6e671516e21ed089ddb"
-PRIVATE_KEY = "4a84d88eeb646ee7efeb159562c6db8cf4d131df"
-
-m = Marvel(PUBLIC_KEY, PRIVATE_KEY)
-
-characters = m.characters
-comics = m.comics 
-creators = m.creators 
-events = m.events 
-series = m.series 
-stories = m.stories
-
 timestamp = datetime.datetime.now().strftime('%Y-%m-%d%H:%M:%S')
 
 app = Flask(__name__)
 
-def hash_params():
-    """ Marvel API requires server side API calls to include
-    md5 hash of timestamp + public key + private key """
-
-    hash_md5 = hashlib.md5()
-    hash_md5.update(f'{timestamp}{PRIVATE_KEY}{PUBLIC_KEY}'.encode('utf-8'))
-    hashed_params = hash_md5.hexdigest()
-
-    return hashed_params
 
 @app.route("/")
 def hello_world():
@@ -40,7 +25,7 @@ def hello_world():
 
 @app.route("/characters")
 def characters():
-    params = {'ts': timestamp, 'apikey': PUBLIC_KEY, 'hash': hash_params()};
+    params = get_params()
     res = requests.get('https://gateway.marvel.com:443/v1/public/characters/1009399',
                     params=params)
     results = res.json()["data"]["results"][0]
@@ -54,10 +39,35 @@ def characters():
     name = results["name"]
     series = series_data["items"]
     stories = stories_data["items"]
+
+    story_resource = get_story(stories)
+    story_data_req = requests.get(story_resource['resourceURI'], params=params)
+    story_results = story_data_req.json()["data"]["results"][0]
+
+    story_description = story_results["description"]
+    story_characters = story_results["characters"]["items"]
+
+    character_names = get_characters(story_characters)
+    character_pictures = get_character_thumbnails(story_characters)
+    char_pic_paths = []
+    for pic in character_pictures:
+        char_pic_paths.append(pic['path'])
+
+    characters = character_names_and_thumbnails(character_names, char_pic_paths)
+
     char_thumbnail = results["thumbnail"]
     char_thumb_path = char_thumbnail["path"]
     
-    return render_template('./index.html', name=name, comics=comics)
+    return render_template(
+        './index.html', 
+        name=name, 
+        comics=comics, 
+        story_desc=story_description,
+        char_thumbnail=char_thumb_path,
+        characters=characters,
+        character_pictures=char_pic_paths
+    )
+
 @app.route("/comics")
 def comics():
     html = ""
@@ -92,3 +102,5 @@ def stories():
     for val in stories.all():
         html.append(f"<p>{val}</p>")
     return html
+
+
