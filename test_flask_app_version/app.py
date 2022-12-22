@@ -44,39 +44,41 @@ def my_favourite_marvel_character():
         marvel_attribution=marvel_attribution
     )
 
-@app.route("/comics")
-def comics():
-    html = ""
-    for val in comics:
-        html.append(f"<p>{val}</p>")
-    return html
 
-@app.route("/creators")
-def creators():
-    html = ""
-    for val in creators:
-        html.append(f"<p>{val}</p>")
-    return html
+# FOR FUTURE DEVELOPMENT: ROUTES BELOW
+# @app.route("/comics")
+# def comics():
+#     html = ""
+#     for val in comics:
+#         html.append(f"<p>{val}</p>")
+#     return html
 
-@app.route("/events")
-def events():
-    html = ""
-    for val in events:
-        html.append(f"<p>{val}</p>")
-    return html
+# @app.route("/creators")
+# def creators():
+#     html = ""
+#     for val in creators:
+#         html.append(f"<p>{val}</p>")
+#     return html
 
-@app.route("/series")
-def series():
-    html = ""
-    for val in series:
-        html.append(f"<p>{val}</p>")
-    return html
+# @app.route("/events")
+# def events():
+#     html = ""
+#     for val in events:
+#         html.append(f"<p>{val}</p>")
+#     return html
 
-@app.route("/stories")
-def stories():
-    html = ""
-    for val in stories.all():
-        html.append(f"<p>{val}</p>")
-    return html
+# @app.route("/series")
+# def series():
+#     html = ""
+#     for val in series:
+#         html.append(f"<p>{val}</p>")
+#     return html
+
+# @app.route("/stories")
+# def stories():
+#     html = ""
+#     for val in stories.all():
+#         html.append(f"<p>{val}</p>")
+#     return html
 
 
