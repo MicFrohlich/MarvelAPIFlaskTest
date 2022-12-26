@@ -1,5 +1,4 @@
 from flask import Flask, render_template
-from marvel import Marvel
 from custom_functions import (
     get_story, 
     get_characters, 

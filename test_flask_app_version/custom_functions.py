@@ -2,10 +2,8 @@ import random
 import requests
 import hashlib
 import datetime
+from .secrets import PUBLIC_KEY, PRIVATE_KEY
 
-
-PUBLIC_KEY = "52cc87e2d83af6e671516e21ed089ddb"
-PRIVATE_KEY = "4a84d88eeb646ee7efeb159562c6db8cf4d131df"
 
 timestamp = datetime.datetime.now().strftime('%Y-%m-%d%H:%M:%S')
 
