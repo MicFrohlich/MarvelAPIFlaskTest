@@ -10,7 +10,7 @@ With python installed make sure you have pip and flask installed, if not, please
 
 To run the simple application, once pip, flask and python are installed. Navigate to the directory test_flask_app_version and create a file called:
 
-    secrets.py
+    marvel_secrets.py
 
 Inside secrets.py please place your public and pprivate keys from the Marvel API in the format:
 
