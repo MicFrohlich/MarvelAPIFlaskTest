@@ -2,32 +2,38 @@ import random
 import requests
 import hashlib
 import datetime
-from .secrets import PUBLIC_KEY, PRIVATE_KEY
+import marvel_secrets
 
 
 timestamp = datetime.datetime.now().strftime('%Y-%m-%d%H:%M:%S')
 
+
 def get_params():
     """return the params for any api call"""
-    params = {'ts': timestamp, 'apikey': PUBLIC_KEY, 'hash': hash_params()}
+    params = {'ts': timestamp,
+              'apikey': marvel_secrets.PUBLIC_KEY, 'hash': hash_params()}
     return params
+
 
 def hash_params():
     """ Marvel API requires server side API calls to include
     md5 hash of timestamp + public key + private key """
 
     hash_md5 = hashlib.md5()
-    hash_md5.update(f'{timestamp}{PRIVATE_KEY}{PUBLIC_KEY}'.encode('utf-8'))
+    hash_md5.update(
+        f'{timestamp}{marvel_secrets.PRIVATE_KEY}{marvel_secrets.PUBLIC_KEY}'.encode('utf-8'))
     hashed_params = hash_md5.hexdigest()
 
     return hashed_params
 
+
 def get_story(stories: {}):
     """Get a Story from the list of stories for the given character"""
     story = random.choice(stories)
-    story_resource = story['resourceURI'] 
-    name = story['name'] 
+    story_resource = story['resourceURI']
+    name = story['name']
     return story
+
 
 def get_characters(characters: {}):
     """ Get the character names from the returned character data"""
@@ -36,29 +42,33 @@ def get_characters(characters: {}):
         character_names.append(char["name"])
     return character_names
 
+
 def get_character_thumbnails(story_characters: {}):
     """Get Characters thumbnails from data"""
     char_thumbnails = []
-    params = {'ts': timestamp, 'apikey': PUBLIC_KEY, 'hash': hash_params()}
+    params = {'ts': timestamp,
+              'apikey': marvel_secrets.PUBLIC_KEY, 'hash': hash_params()}
     for char in story_characters:
         res = requests.get(char["resourceURI"], params=params)
         results = res.json()["data"]["results"][0]
         char_thumbnails.append(results["thumbnail"])
     return char_thumbnails
 
+
 def character_names_and_thumbnails(character_names: [], char_pic_paths: []):
     """Return a dictionary with the characters name and their thumbnail"""
     characters = {}
-    assert len(character_names)==len(char_pic_paths)
+    assert len(character_names) == len(char_pic_paths)
     for num in range(len(character_names)):
         characters[character_names[num]] = char_pic_paths[num]
     return characters
+
 
 def get_index_context_data():
     """Function to get all the context data for the marvel page task"""
     params = get_params()
     res = requests.get('https://gateway.marvel.com:443/v1/public/characters/1009399',
-                    params=params)
+                       params=params)
     results = res.json()["data"]["results"][0]
     comics_data = results["comics"]
     stories_data = results["stories"]
@@ -85,7 +95,8 @@ def get_index_context_data():
     for pic in character_pictures:
         char_pic_paths.append(pic['path'])
 
-    characters = character_names_and_thumbnails(character_names, char_pic_paths)
+    characters = character_names_and_thumbnails(
+        character_names, char_pic_paths)
 
     char_thumbnail = results["thumbnail"]
     char_thumb_path = char_thumbnail["path"]

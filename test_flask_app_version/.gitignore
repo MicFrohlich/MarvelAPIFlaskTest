@@ -24,4 +24,4 @@ htmlcov/
 .coverage.*
 *,cover
 
-secrets.py
+marvel_secrets.py
